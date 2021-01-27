@@ -1,6 +1,6 @@
 import os
 import cv2
-import numpy
+import numpy as np
 import datetime
 import pyautogui
 import tkinter as tk
@@ -94,6 +94,7 @@ class Trimming():
     def Display(self, frame): # 指定された画像の表示
 
         OrgImg = Image.open(SelectedFile)
+        
         img = OrgImg.copy()
 
         img = self.Resize(img)
@@ -115,6 +116,8 @@ class Trimming():
     def Resize(self, img): # 画像のサイズを変更
 
         global ImageScale
+
+        ImageScale = 1.0
 
         if(img.width > WindowSizeWidth and img.height > WindowSizeHeight - 150): # 縦と横のどちらもはみ出した場合
             if(WindowSizeWidth / img.width >= (WindowSizeHeight - 150) / img.height):
@@ -211,9 +214,12 @@ class Trimming():
             
             global SelectedFile
 
-            img = cv2.imread(SelectedFile)
+            pilIn = Image.open(SelectedFile)
+            img = np.array(pilIn)
 
-            if isinstance(img, numpy.ndarray):
+            img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
+
+            if isinstance(img, np.ndarray):
                 height, width, channels = img.shape
 
                 img_changeSize = cv2.resize(img, (int(width * ImageScale), int(height * ImageScale))) # 画像サイズの変更
