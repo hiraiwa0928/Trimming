@@ -70,7 +70,10 @@ class Trimming():
         tmpFile = SelectedFile
         
         fTyp = [('PNG Files', '*.png'), ('JPG Files', '*.jpg'), ('JPEG Files', '*.jpeg')]
-        iDir = os.path.abspath(os.path.dirname(__file__))
+        if len(SelectedFile) == 0:
+            iDir = os.path.abspath(os.path.dirname(__file__))
+        else:
+            iDir = SelectedFile
         SelectedFile = tk.filedialog.askopenfilename(filetypes = fTyp, initialdir = iDir)
 
         if len(SelectedFile) == 0:
@@ -83,10 +86,14 @@ class Trimming():
             self.Destroy(frame) 
             self.Display(frame)
     
-    def folder_dialog(self, event):
+    def folder_dialog(self, event): # フォルダダイアログの設定
         global SaveImageFolder
 
-        iDir = os.getcwd()
+        if len(SaveImageFolder) == 0:
+            iDir = os.getcwd()
+        else:
+            iDir = SaveImageFolder
+        
         SaveImageFolder = tk.filedialog.askdirectory(initialdir = iDir)
         if len(SaveImageFolder) != 0:
             self.folder_name.set(f'保存先:{SaveImageFolder}')
@@ -170,7 +177,7 @@ class Trimming():
         if len(SaveImageFolder) != 0:
             self.SaveImage(canvas)
     
-    def SaveImage(self, canvas):
+    def SaveImage(self, canvas): # トリミングした画像を保存
 
         res = messagebox.askokcancel('確認', '指定した部分を保存しますか？')
 
@@ -228,15 +235,15 @@ class Trimming():
 
                 dt = datetime.datetime.now()
 
-                cv2.imwrite(f'{SaveImageFolder}/{dt.strftime("%Y%m%d%H%M%S")}_{SelectedFile.split("/")[-1]}', img_trim) # トリミングした画像を保存
+                cv2.imwrite(f'{SaveImageFolder}/{dt.strftime("%Y%m%d%H%M%S")}.png', img_trim) # トリミングした画像を保存
             
             else:
                 messagebox.showerror('禁止', 'この画像はトリミングが出来ません')
     
-    def createRectangle(self, event, canvas):
+    def createRectangle(self, event, canvas): # トリミングする範囲を囲む
         canvas.create_rectangle(TrimmingImg_x1, TrimmingImg_y1, event.x, event.y, outline = 'red', width = 3, tag = 'rectangle')
     
-    def deleteRectangle(self, canvas):
+    def deleteRectangle(self, canvas): # トリミングする範囲を削除
         objs = canvas.find_withtag('rectangle')
         for obj in objs:
             canvas.delete(obj)
