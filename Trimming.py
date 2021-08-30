@@ -235,9 +235,12 @@ class Trimming():
         self.deleteRectangle(canvas)
 
         if res:
-            self.SaveImage(canvas, num)
+            dt = datetime.datetime.now()
+            self.SaveImage(canvas, num, dt)
+            global SaveFileNum
+            SaveFileNum = 0
             
-    def SaveImage(self, canvas, num): # トリミングした画像を保存
+    def SaveImage(self, canvas, num, dt): # トリミングした画像を保存
 
         pilIn = Image.open(SelectedFile)
         img = np.array(pilIn)
@@ -254,8 +257,6 @@ class Trimming():
 
                 global SaveFileNum
                 SaveFileNum = SaveFileNum + 1
-
-                dt = datetime.datetime.now()
 
                 try:
                     cv2.imwrite(f'{SelectedFolder_Save}/{dt.strftime("%Y%m%d%H%M%S")}_file{SaveFileNum}.png', img_trim) # トリミングした画像を保存
@@ -313,6 +314,8 @@ class Trimming():
         
         global SelectedFile
 
+        dt = datetime.datetime.now()
+
         for i in range(index, len(files)):
             ext = files[i].split('.')[-1].lower()
             print(f'{i}: {files[i]}')
@@ -320,7 +323,10 @@ class Trimming():
             if(ext == 'png' or ext == 'jpg' or ext == 'jpeg'):
                 time.sleep(0.03)
                 SelectedFile = SelectedFolder_AllImage + '/' + files[i]
-                self.SaveImage(canvas, 1)
+                self.SaveImage(canvas, 1, dt)
+        
+        global SaveFileNum
+        SaveFileNum = 0
         
         print(SelectedFolder_Save)
         subprocess.Popen(f'start {SelectedFolder_Save}', shell = True)
